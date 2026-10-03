@@ -1,0 +1,106 @@
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('/fonts/Vazirmatn.woff2') format('woff2-variations');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+@layer base {
+    html {
+        font-family: 'Vazirmatn', Tahoma, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+        @apply antialiased;
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        @apply bg-transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply rounded-full bg-slate-300 dark:bg-slate-700;
+    }
+}
+
+@layer components {
+    .card {
+        @apply rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900;
+    }
+
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .btn-primary {
+        @apply btn bg-brand-600 text-white hover:bg-brand-700 focus:ring-brand-500 dark:focus:ring-offset-slate-900;
+    }
+
+    .btn-ghost {
+        @apply btn border border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-offset-slate-900;
+    }
+
+    .btn-danger {
+        @apply btn bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500 dark:focus:ring-offset-slate-900;
+    }
+
+    .input {
+        @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100;
+    }
+
+    .label {
+        @apply mb-1.5 block text-xs font-bold text-slate-500 dark:text-slate-400;
+    }
+
+    .chip {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold;
+    }
+}
+
+/* Leaflet must not inherit RTL transforms — the API itself is LTR. */
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom,
+.leaflet-control {
+    direction: ltr;
+    text-align: left;
+}
+
+.leaflet-container {
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    background: #e2e8f0;
+}
+
+.dark .leaflet-container {
+    background: #0f172a;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+    @apply rounded-lg text-slate-800 dark:text-slate-100;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, .18);
+}
+
+.dark .leaflet-popup-content-wrapper {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+.dark .leaflet-popup-tip {
+    background: #1e293b;
+}
