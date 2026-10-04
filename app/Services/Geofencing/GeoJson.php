@@ -147,6 +147,12 @@ final class GeoJson
             throw new InvalidArgumentException('چندضلعی باید دست‌کم ۳ رأس داشته باشد.');
         }
 
+        // A collapsed shape (identical or collinear vertices) has a zero-size
+        // bbox and could never contain a ping — reject it at save time.
+        if (self::area($ring) < 1e-12) {
+            throw new InvalidArgumentException('مساحت چندضلعی صفر است؛ شکل بزرگ‌تری رسم کنید.');
+        }
+
         $closed = array_map(fn (array $p) => [round($p[1], 8), round($p[0], 8)], $ring);
         $closed[] = $closed[0];
 
@@ -154,6 +160,27 @@ final class GeoJson
             'type' => 'Polygon',
             'coordinates' => [$closed],
         ];
+    }
+
+    /**
+     * Shoelace area of a flat [lat, lng] ring, in square degrees.
+     * (Unit-agnostic: only "is it zero?" matters here.)
+     *
+     * @param  array<int, array{0: float, 1: float}>  $ring
+     */
+    private static function area(array $ring): float
+    {
+        $sum = 0.0;
+        $n = count($ring);
+
+        for ($i = 0; $i < $n; $i++) {
+            [$lat1, $lng1] = $ring[$i];
+            [$lat2, $lng2] = $ring[($i + 1) % $n];
+
+            $sum += ($lng1 * $lat2) - ($lng2 * $lat1);
+        }
+
+        return abs($sum) / 2;
     }
 
     /**
