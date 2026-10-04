@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -19,6 +20,7 @@ class Person extends Model
         'personnel_code',
         'full_name',
         'national_id',
+        'phone',
         'department',
         'contract_type',
         'avatar_url',
@@ -50,6 +52,26 @@ class Person extends Model
         return $this->hasOne(Device::class);
     }
 
+    /**
+     * Person-specific access rules (target_type = person, target_id = this person).
+     */
+    public function zoneRules(): HasMany
+    {
+        return $this->hasMany(ZoneAccessRule::class, 'target_id')->where('target_type', 'person');
+    }
+
+    /**
+     * Zones this person is explicitly linked to through an access rule.
+     * (Wildcard / department / contract rules are not per-person links.)
+     */
+    public function zones(): BelongsToMany
+    {
+        return $this->belongsToMany(Zone::class, 'zone_access_rules', 'target_id', 'zone_id')
+            ->where('zone_access_rules.target_type', 'person')
+            ->withPivot(['access_type'])
+            ->withTimestamps();
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
@@ -66,6 +88,7 @@ class Person extends Model
         return $query->where(function ($q) use ($like) {
             $q->where('full_name', 'like', $like)
                 ->orWhere('personnel_code', 'like', $like)
+                ->orWhere('phone', 'like', $like)
                 ->orWhere('department', 'like', $like);
         });
     }

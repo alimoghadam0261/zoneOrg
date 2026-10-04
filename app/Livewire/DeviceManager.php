@@ -114,8 +114,11 @@ class DeviceManager extends Component
     public function render()
     {
         return view('livewire.device-manager', [
-            'devices' => Device::query()->with('person:id,full_name,personnel_code')->latest('id')->paginate(15),
-            'people' => Person::query()->orderBy('full_name')->get(['id', 'full_name', 'personnel_code']),
+            'devices' => Device::query()
+                ->with(['person:id,full_name,personnel_code,phone', 'person.zones:id,name,code,color'])
+                ->latest('id')
+                ->paginate(15),
+            'people' => Person::query()->with('zones:id,name,code,color')->orderBy('full_name')->get(['id', 'full_name', 'personnel_code']),
         ]);
     }
 }

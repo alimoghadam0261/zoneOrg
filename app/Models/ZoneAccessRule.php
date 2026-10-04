@@ -57,9 +57,13 @@ class ZoneAccessRule extends Model
     public function matchesPerson(Person $person): bool
     {
         return match ($this->target_type) {
+            // person rules may be keyed by id (created from People/Device UI)
+            // or by personnel code (typed into the Zone Builder rule box).
             'person' => $this->target_id !== null
                 ? $this->target_id === $person->id
-                : $this->target_value === self::WILDCARD,
+                : ($this->target_value === self::WILDCARD
+                    || ($person->personnel_code !== null
+                        && strcasecmp((string) $this->target_value, (string) $person->personnel_code) === 0)),
             'department' => $this->target_value === self::WILDCARD
                 || ($person->department !== null && strcasecmp((string) $this->target_value, $person->department) === 0),
             'contract_type' => $this->target_value === self::WILDCARD

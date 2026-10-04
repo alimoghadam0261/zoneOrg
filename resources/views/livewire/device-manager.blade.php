@@ -42,7 +42,8 @@
                     <tr>
                         <th class="px-4 py-3 text-start font-black">شناسه دستگاه</th>
                         <th class="px-4 py-3 text-start font-black">نوع</th>
-                        <th class="px-4 py-3 text-start font-black">پرسنل</th>
+                        <th class="px-4 py-3 text-start font-black">پرسنل / موبایل</th>
+                        <th class="px-4 py-3 text-start font-black">محدوده</th>
                         <th class="px-4 py-3 text-start font-black">باتری</th>
                         <th class="px-4 py-3 text-start font-black">آخرین اتصال</th>
                         <th class="px-4 py-3 text-start font-black">توکن</th>
@@ -63,8 +64,29 @@
                                 @if ($device->person)
                                     <div class="font-bold">{{ $device->person->full_name }}</div>
                                     <div dir="ltr" class="text-start font-mono text-[10px] text-slate-400">{{ $device->person->personnel_code }}</div>
+                                    @if ($device->person->phone)
+                                        <div dir="ltr" class="text-start font-mono text-[10px] text-brand-600 dark:text-brand-400">{{ $device->person->phone }}</div>
+                                    @endif
                                 @else
                                     <span class="text-[11px] text-slate-400">متصل نیست</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3">
+                                @if ($device->person && $device->person->zones->isNotEmpty())
+                                    <div class="flex flex-wrap gap-1">
+                                        @foreach ($device->person->zones as $pZone)
+                                            <span wire:key="dz-{{ $device->id }}-{{ $pZone->id }}"
+                                                  @class([
+                                                      'chip py-0.5 text-[10px]',
+                                                      'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300' => $pZone->pivot->access_type === 'deny',
+                                                      'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' => $pZone->pivot->access_type !== 'deny',
+                                                  ])>
+                                                {{ $pZone->code }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <span class="text-[11px] text-slate-400">—</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3">
@@ -105,7 +127,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-4 py-10 text-center text-slate-400">دستگاهی ثبت نشده است.</td>
+                            <td colspan="8" class="px-4 py-10 text-center text-slate-400">دستگاهی ثبت نشده است.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -147,6 +169,19 @@
                                     <option value="{{ $person->id }}">{{ $person->full_name }} ({{ $person->personnel_code }})</option>
                                 @endforeach
                             </select>
+                            @if ($form['person_id'])
+                                @php
+                                    $linkedPerson = $people->firstWhere('id', (int) $form['person_id']);
+                                @endphp
+                                @if ($linkedPerson && $linkedPerson->zones->isNotEmpty())
+                                    <p class="mt-1 text-[10px] text-slate-400">
+                                        محدوده‌های این فرد:
+                                        @foreach ($linkedPerson->zones as $lZone)
+                                            <span class="font-mono">{{ $lZone->code }}</span>{{ !$loop->last ? '، ' : '' }}
+                                        @endforeach
+                                    </p>
+                                @endif
+                            @endif
                         </div>
                     </div>
 

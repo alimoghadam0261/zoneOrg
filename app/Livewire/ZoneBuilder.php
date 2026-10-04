@@ -230,10 +230,18 @@ class ZoneBuilder extends Component
             return;
         }
 
+        $targetId = null;
+
+        // Person rules typed by personnel code are resolved to the person id
+        // so the link is explicit (the code stays in target_value for display).
+        if ($type === 'person') {
+            $targetId = Person::query()->where('personnel_code', $value)->value('id');
+        }
+
         $rules = $this->form['rules'] ?? [];
         $rules[] = [
             'target_type' => $type,
-            'target_id' => null,
+            'target_id' => $targetId,
             'target_value' => $value,
             'access_type' => (string) ($this->form['rule_access'] ?? 'deny'),
         ];
